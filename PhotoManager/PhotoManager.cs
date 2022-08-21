@@ -74,7 +74,7 @@ namespace PhotoManager
             var neosCanvasPanel = s.AttachComponent<NeosCanvasPanel>();
             neosCanvasPanel.Panel.AddCloseButton();
             neosCanvasPanel.Panel.TitleField.Value = "Photo Manager";
-            neosCanvasPanel.CanvasSize = new float2(800f, 1024f);
+            neosCanvasPanel.CanvasSize = new float2(600f, 400f);
             neosCanvasPanel.PhysicalHeight = 0.5f;
             var ui = new UIBuilder(neosCanvasPanel.Canvas);
 
@@ -109,7 +109,7 @@ namespace PhotoManager
                 }
 
                 ObjectGridAligner aligner;
-                var possibleAligner = ProcessRoot.Reference.Target.GetComponent<ObjectGridAligner>();
+                var possibleAligner = NewParent.Reference.Target.GetComponent<ObjectGridAligner>();
                 if (possibleAligner is null)
                 {
                     aligner = ProcessRoot.Reference.Target.AttachComponent<ObjectGridAligner>();
