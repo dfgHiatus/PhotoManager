@@ -95,6 +95,7 @@ namespace PhotoManager
             ui.Current.AttachComponent<RefEditor>().Setup(NewParent.Reference);
             ui.Spacer(24f);
 
+            // This had to passed in as a lambda - otherwise it would not work
             ui.Button("Move all screenshots under \"Process Root\" to \"New Parent\"").LocalPressed += (IButton button, ButtonEventData eventData) => 
             {
                 if (ProcessRoot.Reference.Target is null)
@@ -124,6 +125,14 @@ namespace PhotoManager
                 else
                 {
                     aligner = possibleAligner;
+                    aligner = NewParent.Reference.Target.AttachComponent<ObjectGridAligner>();
+                    aligner.AutoAddChildren.Value = config.GetValue(autoAddChildren);
+                    aligner.HorizontalAlignment.Value = config.GetValue(horizontalAlignment);
+                    aligner.VerticalAlignment.Value = config.GetValue(verticalAlignment);
+                    aligner.RowAxis.Value = config.GetValue(rowAxis);
+                    aligner.ColumnAxis.Value = config.GetValue(columnAxis);
+                    aligner.ItemsPerRow.Value = config.GetValue(itemsPerRow);
+                    aligner.LerpSpeed.Value = config.GetValue(lerpSpeed);
                 }
                 
                 var photos = ProcessRoot.Reference.Target.GetComponentsInChildren<PhotoMetadata>().Select(x => x.Slot);
