@@ -27,7 +27,7 @@ namespace PhotoManager
         public override void DefineConfiguration(ModConfigurationDefinitionBuilder builder)
         {
             builder
-                .Version(new Version(1, 1, 0))
+                .Version(new Version(1, 0, 0))
                 .AutoSave(true);
         }
 
