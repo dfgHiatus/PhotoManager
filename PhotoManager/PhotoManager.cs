@@ -132,12 +132,7 @@ namespace PhotoManager
 
                 foreach (var photo in photos)
                 {
-                    photo.SetParent(NewParent.Reference.Target);
-
-                    // As setting KeepGlobalTransform to false does not reset everything
-                    photo.LocalPosition = float3.Zero; 
-                    photo.LocalRotation = floatQ.Identity;
-                    photo.LocalScale = float3.One;
+                    photo.SetParent(NewParent.Reference.Target, false);
                 }
 
                 ResultsText.Content.Value = $"Found {photosCount} photos to reparent";
