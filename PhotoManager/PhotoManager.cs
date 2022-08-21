@@ -61,6 +61,7 @@ namespace PhotoManager
 
         private static void PhotoOrganizer (Slot s)
         {
+            s.PersistentSelf = false;
             s.GetComponentInChildrenOrParents<Canvas>()?.MarkDeveloper();
             s.AttachComponent<DestroyOnUserLeave>().TargetUser.Target = Engine.Current.WorldManager.FocusedWorld.LocalUser;
 
@@ -69,7 +70,6 @@ namespace PhotoManager
             ProcessRoot.Reference.Target = null;
             NewParent = Data.AddSlot("NewParent").AttachComponent<ReferenceField<Slot>>();
             NewParent.Reference.Target = null;
-            s.PersistentSelf = false;
 
             var neosCanvasPanel = s.AttachComponent<NeosCanvasPanel>();
             neosCanvasPanel.Panel.AddCloseButton();
@@ -99,12 +99,12 @@ namespace PhotoManager
             {
                 if (ProcessRoot.Reference.Target is null)
                 {
-                    ResultsText.Content.Value = $"Please specify a process root";
+                    ResultsText.Content.Value = "Please specify a process root";
                     return;
                 }
                 if (NewParent.Reference.Target is null)
                 {
-                    ResultsText.Content.Value = $"Please specify a new parent";
+                    ResultsText.Content.Value = "Please specify a new parent";
                     return;
                 }
 
@@ -125,8 +125,7 @@ namespace PhotoManager
                 {
                     aligner = possibleAligner;
                 }
-                    
-
+                
                 var photos = ProcessRoot.Reference.Target.GetComponentsInChildren<PhotoMetadata>().Select(x => x.Slot);
                 var photosCount = photos.Count();
 
