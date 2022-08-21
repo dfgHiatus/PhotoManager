@@ -112,7 +112,7 @@ namespace PhotoManager
                 var possibleAligner = NewParent.Reference.Target.GetComponent<ObjectGridAligner>();
                 if (possibleAligner is null)
                 {
-                    aligner = ProcessRoot.Reference.Target.AttachComponent<ObjectGridAligner>();
+                    aligner = NewParent.Reference.Target.AttachComponent<ObjectGridAligner>();
                     aligner.AutoAddChildren.Value = config.GetValue(autoAddChildren);
                     aligner.HorizontalAlignment.Value = config.GetValue(horizontalAlignment);
                     aligner.VerticalAlignment.Value = config.GetValue(verticalAlignment);
