@@ -42,25 +42,25 @@ namespace PhotoManager
             = new ModConfigurationKey<bool>("autoAddChildren", "Auto Add Children", () => true);
         [AutoRegisterConfigKey]
         public static ModConfigurationKey<Align> horizontalAlignment
-            = new ModConfigurationKey<Align>("horizontalAlignment", "Horizontal Alignment", () => Align.Mid);
+            = new ModConfigurationKey<Align>("horizontalAlignment", "Horizontal Alignment", () => Align.Pos);
         [AutoRegisterConfigKey]
         public static ModConfigurationKey<Align> verticalAlignment
-            = new ModConfigurationKey<Align>("verticalAlignment", "Vertical Alignment", () => Align.Pos);
+            = new ModConfigurationKey<Align>("verticalAlignment", "Vertical Alignment", () => Align.Mid);
         [AutoRegisterConfigKey]
         public static ModConfigurationKey<float2> cellSize
-            = new ModConfigurationKey<float2>("cellSize", "Cell Size", () => new float2(5, 5));
+            = new ModConfigurationKey<float2>("cellSize", "Cell Size", () => new float2(0.25f, 0.25f));
         [AutoRegisterConfigKey]
         public static ModConfigurationKey<AxisDir> rowAxis
-            = new ModConfigurationKey<AxisDir>("rowAxis", "Row Axis", () => AxisDir.Xpos);
+            = new ModConfigurationKey<AxisDir>("rowAxis", "Row Axis", () => AxisDir.Ypos);
         [AutoRegisterConfigKey]
         public static ModConfigurationKey<AxisDir> columnAxis
-            = new ModConfigurationKey<AxisDir>("columnAxis", "Column Axis", () => AxisDir.Zpos);
+            = new ModConfigurationKey<AxisDir>("columnAxis", "Column Axis", () => AxisDir.Xpos);
         [AutoRegisterConfigKey]
-        public static ModConfigurationKey<int> itemsPerRow
-            = new ModConfigurationKey<int>("itemsPerRow", "Items Per Row", () => 4);
+        public static ModConfigurationKey<int> defaultitemsPerRow
+            = new ModConfigurationKey<int>("defaultitemsPerRow", "Default Items Per Row", () => 4);
         [AutoRegisterConfigKey]
         public static ModConfigurationKey<float> lerpSpeed 
-            = new ModConfigurationKey<float>("lerpSpeed", "Lerp Speed", () => 4f);
+            = new ModConfigurationKey<float>("lerpSpeed", "Lerp Speed", () => 1.5f);
 
         private static void GeneratePhotoManagerUI (Slot s)
         {
@@ -129,10 +129,8 @@ namespace PhotoManager
                 aligner = possibleAligner;
             }
 
-            // TODO Add itemsPerRow math here
-            // TODO Add proper aligner/axis to config
-
-            ResetPhotoTransforms(aligner);
+            PreparePhotoAligner(aligner);
+            possibleAligner.Slot.LocalScale = float3.One;
             var photos = ProcessRoot.Reference.Target.GetComponentsInChildren<PhotoMetadata>().Select(x => x.Slot);
             var photosCount = photos.Count();
 
@@ -146,7 +144,7 @@ namespace PhotoManager
             ResultsText.Content.Value = $"Found {photosCount} photos to reparent";
         }
 
-        private static void ResetPhotoTransforms(ObjectGridAligner aligner)
+        private static void PreparePhotoAligner(ObjectGridAligner aligner)
         {
             aligner.AutoAddChildren.Value = config.GetValue(autoAddChildren);
             aligner.HorizontalAlignment.Value = config.GetValue(horizontalAlignment);
@@ -154,7 +152,7 @@ namespace PhotoManager
             aligner.CellSize.Value = config.GetValue(cellSize);
             aligner.RowAxis.Value = config.GetValue(rowAxis);
             aligner.ColumnAxis.Value = config.GetValue(columnAxis);
-            aligner.ItemsPerRow.Value = config.GetValue(itemsPerRow);
+            aligner.ItemsPerRow.Value = config.GetValue(defaultitemsPerRow);
             aligner.LerpSpeed.Value = config.GetValue(lerpSpeed);
         }
     }
