@@ -20,7 +20,7 @@ namespace PhotoManager
             new Harmony("net.dfgHiatus.PhotoManager").PatchAll();
             config = GetConfiguration();
             Engine.Current.RunPostInit(() => {
-                DevCreateNewForm.AddAction("Editor", "Photo Manager", PhotoOrganizer);
+                DevCreateNewForm.AddAction("Editor", "Photo Manager", GeneratePhotoManagerUI);
             });
         }
 
@@ -47,6 +47,9 @@ namespace PhotoManager
         public static ModConfigurationKey<Align> verticalAlignment
             = new ModConfigurationKey<Align>("verticalAlignment", "Vertical Alignment", () => Align.Pos);
         [AutoRegisterConfigKey]
+        public static ModConfigurationKey<float2> cellSize
+            = new ModConfigurationKey<float2>("cellSize", "Cell Size", () => new float2(5, 5));
+        [AutoRegisterConfigKey]
         public static ModConfigurationKey<AxisDir> rowAxis
             = new ModConfigurationKey<AxisDir>("rowAxis", "Row Axis", () => AxisDir.Xpos);
         [AutoRegisterConfigKey]
@@ -57,9 +60,9 @@ namespace PhotoManager
             = new ModConfigurationKey<int>("itemsPerRow", "Items Per Row", () => 4);
         [AutoRegisterConfigKey]
         public static ModConfigurationKey<float> lerpSpeed 
-            = new ModConfigurationKey<float>("lerpSpeed", "Lerp Speed", () => float.MaxValue);
+            = new ModConfigurationKey<float>("lerpSpeed", "Lerp Speed", () => 4f);
 
-        private static void PhotoOrganizer (Slot s)
+        private static void GeneratePhotoManagerUI (Slot s)
         {
             s.PersistentSelf = false;
             s.GetComponentInChildrenOrParents<Canvas>()?.MarkDeveloper();
@@ -95,60 +98,64 @@ namespace PhotoManager
             ui.Current.AttachComponent<RefEditor>().Setup(NewParent.Reference);
             ui.Spacer(24f);
 
-            // This had to passed in as a lambda - otherwise it would not work
-            ui.Button("Move all screenshots under \"Process Root\" to \"New Parent\"").LocalPressed += (IButton button, ButtonEventData eventData) => 
-            {
-                if (ProcessRoot.Reference.Target is null)
-                {
-                    ResultsText.Content.Value = "Please specify a process root";
-                    return;
-                }
-                if (NewParent.Reference.Target is null)
-                {
-                    ResultsText.Content.Value = "Please specify a new parent";
-                    return;
-                }
-
-                ObjectGridAligner aligner;
-                var possibleAligner = NewParent.Reference.Target.GetComponent<ObjectGridAligner>();
-                if (possibleAligner is null)
-                {
-                    aligner = NewParent.Reference.Target.AttachComponent<ObjectGridAligner>();
-                    aligner.AutoAddChildren.Value = config.GetValue(autoAddChildren);
-                    aligner.HorizontalAlignment.Value = config.GetValue(horizontalAlignment);
-                    aligner.VerticalAlignment.Value = config.GetValue(verticalAlignment);
-                    aligner.RowAxis.Value = config.GetValue(rowAxis);
-                    aligner.ColumnAxis.Value = config.GetValue(columnAxis);
-                    aligner.ItemsPerRow.Value = config.GetValue(itemsPerRow);
-                    aligner.LerpSpeed.Value = config.GetValue(lerpSpeed);
-                }
-                else
-                {
-                    aligner = possibleAligner;
-                    aligner = NewParent.Reference.Target.AttachComponent<ObjectGridAligner>();
-                    aligner.AutoAddChildren.Value = config.GetValue(autoAddChildren);
-                    aligner.HorizontalAlignment.Value = config.GetValue(horizontalAlignment);
-                    aligner.VerticalAlignment.Value = config.GetValue(verticalAlignment);
-                    aligner.RowAxis.Value = config.GetValue(rowAxis);
-                    aligner.ColumnAxis.Value = config.GetValue(columnAxis);
-                    aligner.ItemsPerRow.Value = config.GetValue(itemsPerRow);
-                    aligner.LerpSpeed.Value = config.GetValue(lerpSpeed);
-                }
-                
-                var photos = ProcessRoot.Reference.Target.GetComponentsInChildren<PhotoMetadata>().Select(x => x.Slot);
-                var photosCount = photos.Count();
-
-                foreach (var photo in photos)
-                {
-                    photo.SetParent(NewParent.Reference.Target, false);
-                }
-
-                ResultsText.Content.Value = $"Found {photosCount} photos to reparent";
-            };
+            ui.Button("Move all screenshots under \"Process Root\" to \"New Parent\"").LocalPressed += CollectPhotos;
 
             ui.Spacer(24f);
             ResultsText = ui.Text("Photos found: ---");
             ui.Spacer(24f);
+        }
+
+        private static void CollectPhotos (IButton button, ButtonEventData eventData)
+        {
+            if (ProcessRoot.Reference.Target is null)
+            {
+                ResultsText.Content.Value = "Please specify a process root";
+                return;
+            }
+            if (NewParent.Reference.Target is null)
+            {
+                ResultsText.Content.Value = "Please specify a new parent";
+                return;
+            }
+
+            ObjectGridAligner aligner;
+            var possibleAligner = NewParent.Reference.Target.GetComponent<ObjectGridAligner>();
+            if (possibleAligner is null)
+            {
+                aligner = NewParent.Reference.Target.AttachComponent<ObjectGridAligner>();
+            }
+            else
+            {
+                aligner = possibleAligner;
+            }
+
+            // TODO Add itemsPerRow math here
+            // TODO Add proper aligner/axis to config
+
+            ResetPhotoTransforms(aligner);
+            var photos = ProcessRoot.Reference.Target.GetComponentsInChildren<PhotoMetadata>().Select(x => x.Slot);
+            var photosCount = photos.Count();
+
+            foreach (var photo in photos)
+            {
+                photo.SetParent(NewParent.Reference.Target, false);
+                photo.LocalRotation = floatQ.Identity;
+                photo.LocalScale = float3.One;
+            }
+
+            ResultsText.Content.Value = $"Found {photosCount} photos to reparent";
+        }
+
+        private static void ResetPhotoTransforms(ObjectGridAligner aligner)
+        {
+            aligner.AutoAddChildren.Value = config.GetValue(autoAddChildren);
+            aligner.HorizontalAlignment.Value = config.GetValue(horizontalAlignment);
+            aligner.VerticalAlignment.Value = config.GetValue(verticalAlignment);
+            aligner.CellSize.Value = config.GetValue(cellSize);
+            aligner.RowAxis.Value = config.GetValue(rowAxis);
+            aligner.ColumnAxis.Value = config.GetValue(columnAxis);
+            aligner.ItemsPerRow.Value = config.GetValue(itemsPerRow);
+            aligner.LerpSpeed.Value = config.GetValue(lerpSpeed);
         }
     }
 }
