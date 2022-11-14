@@ -4,11 +4,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("PhotoManager")]
-[assembly: AssemblyDescription("A photo and screenshot organizer for NeosVR.")]
+[assembly: AssemblyTitle("ComponentHunter")]
+[assembly: AssemblyDescription("A component locater for NeosVR.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Hiatus Labs")]
-[assembly: AssemblyProduct("PhotoManager")]
+[assembly: AssemblyProduct("ComponentHunter")]
 [assembly: AssemblyCopyright("Copyright ©  2022")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
